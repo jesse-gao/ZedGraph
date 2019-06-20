@@ -1,6 +1,6 @@
 //============================================================================
 //ZedGraph Class Library - A Flexible Line Graph/Bar Graph Library in C#
-//Copyright © 2007  John Champion
+//Copyright Â© 2007  John Champion
 //
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -422,6 +422,16 @@ namespace ZedGraph
 			set { _isShowCursorValues = value; }
 		}
 
+		[Bindable(true),Category("Display"),NotifyParentProperty(true),DefaultValue(false),
+		Description("true to display cursor line when mouse move")]
+		public bool IsShowCursorLine {
+		    get {
+			return this._isShowCursorLine;
+		    }
+		    set {
+			this._isShowCursorLine = value;
+		    }
+		}
 		/// <summary>
 		/// Gets or sets a value that determines whether or not editing of point data is allowed in
 		/// the horizontal direction.
