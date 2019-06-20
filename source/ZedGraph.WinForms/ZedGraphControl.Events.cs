@@ -1,6 +1,6 @@
 //============================================================================
 //ZedGraph Class Library - A Flexible Line Graph/Bar Graph Library in C#
-//Copyright © 2007  John Champion
+//Copyright Â© 2007  John Champion
 //
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -683,6 +683,9 @@ namespace ZedGraph
 
 				// If the mouse is being dragged,
 				// undraw and redraw the rectangle as the mouse moves.
+				if (_isShowCursorLine) {
+				    this.HandleCursorLine(mousePt);
+				}
 				if ( _isZooming )
 					HandleZoomDrag( mousePt );
 				else if ( _isPanning )
@@ -711,7 +714,7 @@ namespace ZedGraph
 				if ( _masterPane.FindNearestPaneObject( mousePt,
 					g, out pane, out nearestObj, out iPt ) )
 				{
-					if ( nearestObj is CurveItem && iPt >= 0 )
+					if ( nearestObj is CurveItem && iPt >= 0 && !Object.Equals(nearestObj,this.lastObj))
 					{
 						CurveItem curve = (CurveItem)nearestObj;
 						// Provide Callback for User to customize the tooltips
@@ -767,6 +770,7 @@ namespace ZedGraph
 				else
 					this.DisableToolTip();
 			}
+			this.lastObj=nearestObj;
 			return mousePt;
 		}
 
@@ -1441,6 +1445,32 @@ namespace ZedGraph
 		}
 
 	#endregion
-
+		private void HandleCursorLine(Point mousePt, bool drawNew = true) {
+		    IntPtr hdc = _ShowSurface.GetHdc();
+		    int num = SetROP2(hdc, 7);
+		    IntPtr drawPen = CreatePen(2, 1, ColorTranslator.ToWin32(BackColor));
+		    IntPtr hObject2 = SelectObject(hdc, drawPen);
+		    if (_LastAssistantLine != null) {
+			MoveToEx(hdc, _LastAssistantLine.HLeftX, _LastAssistantLine.HLeftY, null);
+			LineTo(hdc, _LastAssistantLine.HRightX, _LastAssistantLine.HRightY);
+			MoveToEx(hdc, _LastAssistantLine.VTopX, _LastAssistantLine.VTopY, null);
+			LineTo(hdc, _LastAssistantLine.VBottomX, _LastAssistantLine.VBottomY);
+			_LastAssistantLine = null;
+		    }
+		    GraphPane graphPane = _masterPane.FindPane(mousePt);
+		    if (graphPane != null && drawNew) {
+			Rectangle rectangle = Rectangle.Ceiling(graphPane._chart._rect);
+			if (graphPane._chart._rect.Contains(mousePt)) {
+			    _LastAssistantLine = new AssistantLine(rectangle.Left, mousePt.Y, rectangle.Right, mousePt.Y, mousePt.X, rectangle.Top, mousePt.X, rectangle.Bottom);
+			    MoveToEx(hdc, _LastAssistantLine.HLeftX, _LastAssistantLine.HLeftY, null);
+			    LineTo(hdc, _LastAssistantLine.HRightX, _LastAssistantLine.HRightY);
+			    MoveToEx(hdc, _LastAssistantLine.VTopX, _LastAssistantLine.VTopY, null);
+			    LineTo(hdc, _LastAssistantLine.VBottomX, _LastAssistantLine.VBottomY);
+			}
+		    }
+		    SelectObject(hdc, hObject2);
+		    DeleteObject(drawPen);
+		    _ShowSurface.ReleaseHdc(hdc);
+		}
 	}
 }
