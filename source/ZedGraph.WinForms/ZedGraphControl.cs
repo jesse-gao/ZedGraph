@@ -1,6 +1,6 @@
 //============================================================================
 //ZedGraph Class Library - A Flexible Line Graph/Bar Graph Library in C#
-//Copyright � 2004  John Champion
+//Copyright © 2004  John Champion
 //
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -259,6 +259,14 @@ namespace ZedGraph
 		/// </summary>
 		//private List<CurveItem> _selection = new List<CurveItem>();
 		private Selection _selection = new Selection();
+		
+		/// <summary>
+		/// Internal variable that indicates the cursor line is show or not
+		/// </summary>
+		private bool _isShowCursorLine = false;
+
+		private Graphics _ShowSurface;
+		private AssistantLine _LastAssistantLine = null;
 
 	#endregion
 
@@ -484,6 +492,11 @@ namespace ZedGraph
 		// moved to the menu item within the context menu.  Therefore, this point is saved so
 		// that we have the point at which the context menu was first right-clicked
 		internal Point _menuClickPt;
+		
+		/// <summary>
+		/// 上次显示Tooltip的对象，用以防止Tooltip闪烁
+		/// </summary>
+		private Object lastObj;
 
 	#endregion
 
